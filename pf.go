@@ -37,14 +37,12 @@ func (n *Network) CreatePF(leak, local bool) {
 	n.PFRules.WriteString("set block-policy drop\n")
 	n.PFRules.WriteString("set ruleset-optimization basic\n")
 	n.PFRules.WriteString("set skip on lo0\n")
-	n.PFRules.WriteString("block all\n")
-	n.PFRules.WriteString("block out quick inet6 all\n")
+	n.PFRules.WriteString("table <nonprivate> const { 0.0.0.0/5, 8.0.0.0/7, 11.0.0.0/8, 12.0.0.0/6, 16.0.0.0/4, 32.0.0.0/3, 64.0.0.0/3, 96.0.0.0/4, 112.0.0.0/5, 120.0.0.0/6, 124.0.0.0/7, 126.0.0.0/8, 128.0.0.0/3, 160.0.0.0/5, 168.0.0.0/8, 169.0.0.0/9, 169.128.0.0/10, 169.192.0.0/11, 169.224.0.0/12, 169.240.0.0/13, 169.248.0.0/14, 169.252.0.0/15, 169.255.0.0/16, 170.0.0.0/7, 172.0.0.0/12, 172.32.0.0/11, 172.64.0.0/10, 172.128.0.0/9, 173.0.0.0/8, 174.0.0.0/7, 176.0.0.0/4, 192.0.0.0/9, 192.128.0.0/11, 192.160.0.0/13, 192.169.0.0/16, 192.170.0.0/15, 192.172.0.0/14, 192.176.0.0/12, 192.192.0.0/10, 193.0.0.0/8, 194.0.0.0/7, 196.0.0.0/6, 200.0.0.0/5, 208.0.0.0/4, 240.0.0.0/5, 248.0.0.0/6, 252.0.0.0/7, 254.0.0.0/8, 255.0.0.0/9, 255.128.0.0/10, 255.192.0.0/11, 255.224.0.0/12, 255.240.0.0/13, 255.248.0.0/14, 255.252.0.0/15, 255.254.0.0/16, 255.255.0.0/17, 255.255.128.0/18, 255.255.192.0/19, 255.255.224.0/20, 255.255.240.0/21, 255.255.248.0/22, 255.255.252.0/23, 255.255.254.0/24, 255.255.255.0/25, 255.255.255.128/26, 255.255.255.192/27, 255.255.255.224/28, 255.255.255.240/29, 255.255.255.248/30, 255.255.255.252/31, 255.255.255.254/32 }\n")
+	// n.PFRules.WriteString("block out quick inet6 all\n")
 	if leak {
 		n.PFRules.WriteString("pass quick proto {tcp, udp} from any to any port 53 keep state\n")
 	}
-	n.PFRules.WriteString("pass from any to 255.255.255.255 keep state\n")
-	n.PFRules.WriteString("pass from 255.255.255.255 to any keep state\n")
-	n.PFRules.WriteString("pass proto udp from any to 224.0.0.0/4 keep state\n")
-	n.PFRules.WriteString("pass proto udp from 224.0.0.0/4 to any keep state\n")
+	n.PFRules.WriteString("block inet from <nonprivate> to any\n")
+	n.PFRules.WriteString("block inet from any to <nonprivate>\n")
 	n.PFRules.WriteString(pass.String())
 }
